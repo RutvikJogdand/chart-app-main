@@ -10,9 +10,10 @@ import download from 'downloadjs'
 
 function MainPage(){
 
+    const [loading, setLoading] = useState(0)
     const generatePDF =  () => {
-        // Make an API request to the Express.js server to generate the PDF
-        axios.get('https://exuberant-tuna-tutu.cyclic.app/api/generate-pdf',{
+        setLoading(1)
+        axios.get('http://localhost:5000/api/generate-pdf',{
             method: 'GET',
             headers: {
                 'Access-Control-Allow-Origin': '*',
@@ -25,7 +26,7 @@ function MainPage(){
             if (response) {
                 const content = response.headers['content-type'];
                 download(response.data, content)
-                // document.body.removeChild(a);
+                setLoading(2)
             }
 
             console.log("response", response)
@@ -33,6 +34,7 @@ function MainPage(){
 
         ).catch( err =>{
             console.log('err',err)
+            setLoading(3)
         }
 
         ); // Replace with the actual server address
@@ -46,6 +48,16 @@ function MainPage(){
             <div>
                 <img style={{cursor:"pointer"}} onClick={generatePDF} src={printIcon}/>
             </div>
+            {
+                loading === 1 ?
+                "Getting your file ready..."
+                :
+                loading === 2 ?
+                <p style={{color:"green"}}>File Done!</p>
+                :
+                loading === 3 &&
+                <p>Error downloading PDF</p>
+            }
         </>
     )
 }
